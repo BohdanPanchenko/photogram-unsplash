@@ -25,7 +25,8 @@ h3 {
 
 .search-top {
     display: flex;
-    margin-bottom: 45px;
+    column-gap: 100px;
+    /* margin-bottom: 45px; */
     align-items: center;
 }
 
@@ -68,12 +69,55 @@ h3 {
 .search-input {
     display: flex;
     justify-content: center;
-    border-radius: 10px;
-    overflow: hidden;
+    /* border-radius: 10px; */
+    /* overflow: hidden; */
     width: fit-content;
     margin: 0 auto;
+}
 
+.search-input form {
+    position: relative;
+}
 
+.search-input form .search-values {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    transform: translateY(calc(100% + 5px));
+    /* background-color: #fff; */
+    overflow: hidden;
+
+    z-index: 10;
+
+}
+
+.search-input form .search-value {
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    width: 300px;
+    outline: none;
+    padding: 8px 15px;
+    font-size: 14px;
+    border: none;
+    background: #eeeeee;
+    color: #6f6f6f;
+    cursor: pointer;
+    appearance: none;
+    text-align: left;
+    transition: color 0.4s, ;
+    border-radius: 10px;
+    background-color: #eeeeeecf;
+}
+
+.search-input form .search-value:not(:last-child) {
+    margin-bottom: 3px;
+}
+
+.search-input form .search-value:hover {
+    /* color: #fff;
+    background-color: #6f6f6f88; */
+    background-color: #fff;
 }
 
 input[type="search"]::-webkit-search-decoration,
@@ -96,6 +140,8 @@ input[type="search"]::-webkit-search-results-decoration {
     cursor: pointer;
     appearance: none;
     text-align: left;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 button {
@@ -104,7 +150,8 @@ button {
 
 .clear-btn {
     background-color: #eeeeee;
-    border-right: 1px solid #000
+    border-right: 1px solid #000;
+    outline: none;
 }
 
 .clear-btn img {
@@ -114,6 +161,8 @@ button {
 .search-btn {
     background-color: #eeeeee;
     outline: none;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .search-btn img {

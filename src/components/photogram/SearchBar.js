@@ -1,28 +1,71 @@
 // import { unstable_createChainedFunction } from "@mui/utils";
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import "./SearchBar.css";
+const API_KEY = "CxK-Wzyy1lvL4WyHG6VypCmrVvmU8iTsSyQr-dCZkws&page";
 const SearchBar = (props) => {
-  const categories = [
-    { name: "Animals", src: "./images/categories/animals.jpg" },
-    { name: "Food", src: "./images/categories/food.jpg" },
-    { name: "Sport", src: "./images/categories/sport.jpg" },
-    { name: "Art", src: "./images/categories/art.jpg" },
-    { name: "Nature", src: "./images/categories/nature.jpg" },
-  ];
-  const [searchValue, setSearchValue] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState("Animals");
-  const [favoritesActive, setFavoritesActive] = React.useState(false);
-  const [searchActive, setSearchActive] = React.useState(false);
+  const dispatch = useDispatch();
+  const [requestCounter, setRequestCounter] = React.useState(0);
+  // const categories = [
+  //   { name: "Animals", src: "./images/categories/animals.jpg" },
+  //   { name: "Food", src: "./images/categories/food.jpg" },
+  //   { name: "Sport", src: "./images/categories/sport.jpg" },
+  //   { name: "Art", src: "./images/categories/art.jpg" },
+  //   { name: "Nature", src: "./images/categories/nature.jpg" },
+  // ];
+  const [searchValue, setSearchValue] = React.useState("cats");
+  const [searchPrevValue, setSearchPrevValue] = React.useState("");
+  const searchActive = useSelector((state) => state.search.searchActive);
+  const [searchFocused, setSearchFocused] = React.useState(false);
+  const favoritesActive = useSelector(
+    (state) => state.favorites.favoritesActive
+  );
+  const favoritesLength = useSelector(
+    (state) => state.favorites.favorites.length
+  );
+
+  const pagesNumber = useSelector((state) => state.pagination.pagesNumber);
+  const firstIndexToShow = useSelector(
+    (state) => state.pagination.firstIndexToShow
+  );
+  const currentPage = useSelector((state) => state.pagination.currentPage);
+  const queryParams = {
+    search: searchValue,
+    imagesCount: 30,
+  };
+  const searchValues = useSelector((state) => state.search.searchValues.values);
+
   React.useEffect(() => {
-    setFavoritesActive(() => props.favoritesActive);
-  }, [props.favoritesActive]);
+    // fetchImages();
+  }, []);
   function clearSearchField() {
     setSearchValue(() => "");
   }
+  function setSearchActive(value) {
+    dispatch({
+      type: "SET_SEARCH_ACTIVE",
+      payload: {
+        value: value,
+      },
+    });
+    props.calculatePagesNumber(true);
+  }
+  function setFavoritesActive() {
+    dispatch({
+      type: "SET_FAVORITES_ACTIVE",
+    });
+    props.calculatePagesNumber(true);
+  }
   function onSubmitHandler() {
-    if (!isEmptyString(searchValue)) {
-      setSearchActive(() => true);
-      props.searchByKeywords(searchValue);
+    if (!isEmptyString(searchValue) && searchValue !== searchPrevValue) {
+      addSearchValue();
+      setSearchPrevValue(() => searchValue);
+      fetchImages();
+      setSearchActive(true);
+      rememberPreviousState(searchActive);
+      resetPagination();
+      props.calculatePagesNumber();
+      if (favoritesActive) setFavoritesActive();
     }
   }
   function isEmptyString(input) {
@@ -33,6 +76,78 @@ const SearchBar = (props) => {
     });
     return isEmpty;
   }
+  function resetPagination() {
+    dispatch({ type: "RESET_PAGINATION" });
+  }
+  function toggleFavorites() {
+    rememberPreviousState(searchActive);
+    if (!favoritesActive) {
+      setFavoritesActive();
+      setSearchActive(false);
+      props.calculatePagesNumber(true);
+    } else {
+      setFavoritesActive();
+      setSearchActive(true);
+      props.calculatePagesNumber(false);
+    }
+  }
+  function rememberPreviousState(searchActive) {
+    const previousState = {
+      pagesNumber: pagesNumber,
+      firstIndexToShow: firstIndexToShow,
+      currentPage: currentPage,
+    };
+    if (searchActive) {
+      dispatch({
+        type: "REMEMBER_SEARCH_PREVIOUS_STATE",
+        payload: { previousState: previousState },
+      });
+    } else {
+      dispatch({
+        type: "REMEMBER_FAVORITES_PREVIOUS_STATE",
+        payload: { previousState: previousState },
+      });
+    }
+  }
+  function addSearchValue() {
+    dispatch({
+      type: "ADD_SEARCH_VALUE",
+      payload: { searchValue: searchValue },
+    });
+  }
+  function fetchImages() {
+    console.log("Request has been sent", requestCounter + 1);
+    setRequestCounter((prev) => prev + 1);
+    const query = searchValue;
+    fetch(
+      `https://api.unsplash.com/search/photos?client_id=${API_KEY}&page=1&per_page=${queryParams.imagesCount}&orientation=landscape&query=${queryParams.search}`
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res.results);
+        let newImages = res.results.map((el, index) => {
+          return { id: el.id, src: el.urls.regular };
+        });
+        newImages = shuffleImages(newImages);
+        dispatch({ type: "FETCH_IMAGES", payload: { newImages: newImages } });
+      });
+  }
+  function shuffleImages(images) {
+    let imagesCopy = [...images];
+    let result = [];
+    for (let i = 0; i < images.length; i++) {
+      let randomIndex = getRandomIntInclusive(0, imagesCopy.length - 1);
+      result.push(imagesCopy[randomIndex]);
+      imagesCopy.splice(randomIndex, 1);
+    }
+    return result;
+  }
+  function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
   return (
     <div className="search-bar">
       <div className="search-top">
@@ -52,17 +167,33 @@ const SearchBar = (props) => {
               onChange={(e) => {
                 setSearchValue(() => e.target.value);
               }}
+              onFocus={() => {
+                setSearchFocused(() => true);
+              }}
+              onBlur={() => {
+                setSearchFocused(() => false);
+              }}
             ></input>
+            {searchFocused && (
+              <ul className="search-values">
+                {searchValues.map((el, index) => {
+                  return (
+                    <li key={index} className="search-value">
+                      {el}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </form>
           <button
             className="clear-btn"
             type="button"
             onClick={() => {
-              console.log(searchActive);
-              if (searchActive) {
-                props.backToCategories();
-                setSearchActive(() => false);
-              }
+              // console.log(searchActive);
+              // if (searchActive) {
+              //   setSearchActive(false);
+              // }
               clearSearchField();
             }}
           >
@@ -85,10 +216,7 @@ const SearchBar = (props) => {
           className={
             favoritesActive ? "favorite-filter active" : "favorite-filter"
           }
-          onClick={(e) => {
-            props.showFavorites("favorites");
-            setFavoritesActive((prev) => !prev);
-          }}
+          onClick={toggleFavorites}
         >
           <svg
             width="45"
@@ -105,10 +233,10 @@ const SearchBar = (props) => {
               strokeLinejoin="round"
             />
           </svg>
-          <span>{props.favoritesLength}</span>
+          <span>{favoritesLength}</span>
         </button>
       </div>
-      <div className="search-bottom">
+      {/* <div className="search-bottom">
         <ul className="search-categories">
           {categories.map((el, index) => {
             return (
@@ -130,7 +258,7 @@ const SearchBar = (props) => {
             );
           })}
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 };
