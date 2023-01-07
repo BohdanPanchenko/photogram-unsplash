@@ -1,11 +1,11 @@
 .wrapper {
-    padding: 60px 0;
+    padding: 60px 15px 40px;
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    row-gap: 50px;
+    /* row-gap: 50px; */
     z-index: 10;
     overflow: hidden;
 
@@ -13,16 +13,25 @@
 
 .wrapper>ul {
     max-width: 1200px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
     margin: 0 auto;
-    gap: 30px 20px !important;
+    gap: 30px 20px;
     flex-grow: 1;
-    /* overflow: visible !important; */
+    align-items: baseline;
+    align-items: flex-start;
+    align-content: flex-start;
+    padding-top: 80px;
+
 }
 
 .placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    flex-grow: 1;
     row-gap: 25px;
     padding-top: 50px;
 }
@@ -31,17 +40,46 @@
     position: relative;
     box-shadow: 0 1px 6px rgb(32 33 36 / 28%);
     cursor: pointer;
-    /* background-color: #f0f8ff; */
-    /* animation: slide-in-blurred-top 0.6s cubic-bezier(0.230, 1.000, 0.320, 1.000) both; */
+    flex-basis: 32.83%;
+    padding-bottom: 21.66%;
+    flex-basis: 31.25%;
+    padding-bottom: 20.25%;
+
+
+}
+
+.wrapper>ul>li.image-item>img {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
 
 
 }
 
 .wrapper>ul>li .favorite {
+    /* position: absolute; */
+    order: 2;
+}
+
+.image-actions {
     position: absolute;
+    display: flex;
+    align-items: center;
     bottom: 5%;
     right: 5%;
 }
+
+.download-btn {
+    transition: 0.5s;
+}
+
+.download-btn:hover {
+    transform: scale(1.2);
+}
+
+.download-btn img {}
 
 .favorite svg {
     transition: 0.5s;
@@ -106,12 +144,20 @@ button {
     }
 }
 
-/* @media (max-width:1280px) {
-    .wrapper>ul {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
+@media (max-width:1280px) {
 
-    .wrapper>ul>li {
-        height: 400px !important;
-    }
-} */
+    /* .wrapper>ul {
+        /* grid-template-columns: repeat(2, 460px) !important; 
+        grid-template-columns: repeat(2, 38.3%) !important;
+    }*/
+
+
+
+
+
+
+
+
+
+
+}

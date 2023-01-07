@@ -1,56 +1,4 @@
 const initialState = {
-  // images: [
-
-  //   {
-  //     id: 77,
-  //     category: "Sport",
-  //     src: "./images/sport/parachutes.jpg",
-  //     favorite: false,
-  //     tags: ["parachutes"],
-  //   },
-  //   {
-  //     id: 78,
-  //     category: "Sport",
-  //     src: "./images/sport/pitch.jpg",
-  //     favorite: false,
-  //     tags: ["pitch", "football"],
-  //   },
-  //   {
-  //     id: 79,
-  //     category: "Sport",
-  //     src: "./images/sport/skateboard.jpg",
-  //     favorite: false,
-  //     tags: ["skateboard", "skateboarding"],
-  //   },
-  //   {
-  //     id: 80,
-  //     category: "Sport",
-  //     src: "./images/sport/skiing.jpg",
-  //     favorite: false,
-  //     tags: ["snow", "skiing", "winter"],
-  //   },
-  //   {
-  //     id: 81,
-  //     category: "Sport",
-  //     src: "./images/sport/snowboarding.jpg",
-  //     favorite: false,
-  //     tags: ["snow", "snowboarding", "winter"],
-  //   },
-  //   {
-  //     id: 82,
-  //     category: "Sport",
-  //     src: "./images/sport/surfer.jpg",
-  //     favorite: false,
-  //     tags: ["surfer", "surfing"],
-  //   },
-  //   {
-  //     id: 84,
-  //     category: "Sport",
-  //     src: "./images/sport/water.jpg",
-  //     favorite: false,
-  //     tags: ["swimming", "water"],
-  //   },
-  // ],
   images: [],
   searchActive: true,
   searchPaginationInfo: {
@@ -76,19 +24,47 @@ const searchReducer = (state = initialState, { type, payload }) => {
         ...state,
         searchPaginationInfo: payload.previousState,
       };
+    case "GET_SEARCH_VALUES_FROM_LOCAL_STORAGE":
+      const newSearchValues = JSON.parse(localStorage.getItem("searchValues"));
+      if (newSearchValues)
+        return {
+          ...state,
+          searchValues: {
+            ...state.searchValues,
+            values: newSearchValues,
+            searchCount: newSearchValues.length,
+          },
+        };
+      else return { ...state };
     case "ADD_SEARCH_VALUE":
+      if (state.searchValues.values.indexOf(payload.searchValue) !== -1)
+        return { ...state };
       let searchCount = state.searchValues.searchCount;
-      if (searchCount >= 4) searchCount = 0;
+      if (searchCount >= 6) searchCount = 0;
       else searchCount++;
 
       let searchValues = [...state.searchValues.values];
       searchValues[state.searchValues.searchCount] = payload.searchValue;
+
+      localStorage.setItem("searchValues", JSON.stringify(searchValues));
       return {
         ...state,
         searchValues: {
           ...searchValues,
           values: searchValues,
           searchCount: searchCount,
+        },
+      };
+    case "REMOVE_SEARCH_VALUE":
+      let valuesCopy = [...state.searchValues.values];
+      valuesCopy.splice(payload.index, 1);
+      localStorage.setItem("searchValues", JSON.stringify(valuesCopy));
+      return {
+        ...state,
+        searchValues: {
+          ...state.searchValues,
+          values: valuesCopy,
+          searchCount: state.searchValues.searchCount - 1,
         },
       };
     default:

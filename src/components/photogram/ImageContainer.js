@@ -1,10 +1,9 @@
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 const ImageContainer = (props) => {
   const dispatch = useDispatch();
   const imagesPerPage = 6;
+  const heightToWidth = 0.65;
   const imagePlaceholderURL = "./images/placeholder-image.jpg";
   const firstIndexToShow = useSelector(
     (state) => state.pagination.firstIndexToShow
@@ -13,6 +12,9 @@ const ImageContainer = (props) => {
 
   const images = useSelector((state) => state.search.images);
   const favorites = useSelector((state) => state.favorites.favorites);
+  const favoritesLength = useSelector(
+    (state) => state.favorites.favorites.length
+  );
   const favoritesActive = useSelector(
     (state) => state.favorites.favoritesActive
   );
@@ -36,11 +38,12 @@ const ImageContainer = (props) => {
   ]);
   React.useEffect(() => {
     props.getImagesToShowLength(imagesToShow.length);
+    calculatePagesNumber(favoritesActive);
   }, [imagesToShow]);
   React.useEffect(() => {
     // resetPagination();
     returnPreviousState();
-    // calculatePagesNumber();
+    // calculatePagesNumber(favoritesActive);
   }, [favoritesActive]);
   function addPlaceholders() {
     if (!imagesToShow.length) {
@@ -129,63 +132,128 @@ const ImageContainer = (props) => {
     dispatch({ type: "GET_FAVORITES_FROM_LOCAL_STORAGE" });
   }
   return (
+    // <>
+    //   <ImageList cols={3} rowHeight={260}>
+    //     {imagesToShow.map((el, index) => {
+    //       return (
+    //         <ImageListItem
+    //           style={{
+    //             borderRadius: "15px",
+    //             overflow: "hidden",
+    //           }}
+    //           key={el.id}
+    //           cols={1}
+    //         >
+    //           (
+    //           <img
+    //             alt="img"
+    //             src={el.src}
+    //             style={
+    //               el.src === imagePlaceholderURL
+    //                 ? {
+    //                     objectPosition: "0 -15px",
+    //                     opacity: "0.7",
+    //                   }
+    //                 : null
+    //             }
+    //             onClick={() => {
+    //               props.openPreview(el.src);
+    //             }}
+    //           />
+    //           )
+    //           <button
+    //             className={isFavorite(el.id) ? "favorite added" : "favorite"}
+    //             type="button"
+    //             style={
+    //               el.src === imagePlaceholderURL ? { display: "none" } : null
+    //             }
+    //             onClick={() => {
+    //               toggleFavorite(el.id, el.src);
+    //             }}
+    //           >
+    //             <svg
+    //               viewBox="0 0 20 18"
+    //               fill="none"
+    //               xmlns="http://www.w3.org/2000/svg"
+    //             >
+    //               <path
+    //                 d="M2.31804 2.31804C1.90017 2.7359 1.5687 3.23198 1.34255 3.77795C1.1164 4.32392 1 4.90909 1 5.50004C1 6.09099 1.1164 6.67616 1.34255 7.22213C1.5687 7.7681 1.90017 8.26417 2.31804 8.68204L10 16.364L17.682 8.68204C18.526 7.83812 19.0001 6.69352 19.0001 5.50004C19.0001 4.30656 18.526 3.16196 17.682 2.31804C16.8381 1.47412 15.6935 1.00001 14.5 1.00001C13.3066 1.00001 12.162 1.47412 11.318 2.31804L10 3.63604L8.68204 2.31804C8.26417 1.90017 7.7681 1.5687 7.22213 1.34255C6.67616 1.1164 6.09099 1 5.50004 1C4.90909 1 4.32392 1.1164 3.77795 1.34255C3.23198 1.5687 2.7359 1.90017 2.31804 2.31804V2.31804Z"
+    //                 stroke="#ffe4c4"
+    //                 strokeWidth="2"
+    //                 strokeLinecap="round"
+    //                 strokeLinejoin="round"
+    //               />
+    //             </svg>
+    //           </button>
+    //         </ImageListItem>
+    //       );
+    //     })}
+    //   </ImageList>
+    // </>
     <>
-      <ImageList cols={3} rowHeight={260}>
+      <ul
+        className="images-list"
+        style={
+          {
+            // alignContent: imagesToShow.length < 4 ? "baseline" : "center",
+          }
+        }
+      >
         {imagesToShow.map((el, index) => {
           return (
-            <ImageListItem
+            <li
+              className="image-item"
               style={{
                 borderRadius: "15px",
                 overflow: "hidden",
               }}
               key={el.id}
-              cols={1}
             >
-              (
               <img
-                alt="img"
+                alt="photogram-item"
                 src={el.src}
-                style={
-                  el.src === imagePlaceholderURL
-                    ? {
-                        objectPosition: "0 -15px",
-                        opacity: "0.7",
-                      }
-                    : null
-                }
+                style={{
+                  height:
+                    el.height / el.width < heightToWidth ? "100%" : "auto",
+                  width: el.height / el.width < heightToWidth ? "auto" : "100%",
+                }}
                 onClick={() => {
                   props.openPreview(el.src);
                 }}
               />
-              )
-              <button
-                className={isFavorite(el.id) ? "favorite added" : "favorite"}
-                type="button"
-                style={
-                  el.src === imagePlaceholderURL ? { display: "none" } : null
-                }
-                onClick={() => {
-                  toggleFavorite(el.id, el.src);
-                }}
-              >
-                <svg
-                  viewBox="0 0 20 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+              <div className="image-actions">
+                <button
+                  className={isFavorite(el.id) ? "favorite added" : "favorite"}
+                  type="button"
+                  style={
+                    el.src === imagePlaceholderURL ? { display: "none" } : null
+                  }
+                  onClick={() => {
+                    toggleFavorite(el.id, el.src);
+                  }}
                 >
-                  <path
-                    d="M2.31804 2.31804C1.90017 2.7359 1.5687 3.23198 1.34255 3.77795C1.1164 4.32392 1 4.90909 1 5.50004C1 6.09099 1.1164 6.67616 1.34255 7.22213C1.5687 7.7681 1.90017 8.26417 2.31804 8.68204L10 16.364L17.682 8.68204C18.526 7.83812 19.0001 6.69352 19.0001 5.50004C19.0001 4.30656 18.526 3.16196 17.682 2.31804C16.8381 1.47412 15.6935 1.00001 14.5 1.00001C13.3066 1.00001 12.162 1.47412 11.318 2.31804L10 3.63604L8.68204 2.31804C8.26417 1.90017 7.7681 1.5687 7.22213 1.34255C6.67616 1.1164 6.09099 1 5.50004 1C4.90909 1 4.32392 1.1164 3.77795 1.34255C3.23198 1.5687 2.7359 1.90017 2.31804 2.31804V2.31804Z"
-                    stroke="#ffe4c4"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </ImageListItem>
+                  <svg
+                    viewBox="0 0 20 18"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2.31804 2.31804C1.90017 2.7359 1.5687 3.23198 1.34255 3.77795C1.1164 4.32392 1 4.90909 1 5.50004C1 6.09099 1.1164 6.67616 1.34255 7.22213C1.5687 7.7681 1.90017 8.26417 2.31804 8.68204L10 16.364L17.682 8.68204C18.526 7.83812 19.0001 6.69352 19.0001 5.50004C19.0001 4.30656 18.526 3.16196 17.682 2.31804C16.8381 1.47412 15.6935 1.00001 14.5 1.00001C13.3066 1.00001 12.162 1.47412 11.318 2.31804L10 3.63604L8.68204 2.31804C8.26417 1.90017 7.7681 1.5687 7.22213 1.34255C6.67616 1.1164 6.09099 1 5.50004 1C4.90909 1 4.32392 1.1164 3.77795 1.34255C3.23198 1.5687 2.7359 1.90017 2.31804 2.31804V2.31804Z"
+                      stroke="#ffe4c4"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                <button className="download-btn">
+                  <img alt="download-icon" src="./images/icons/download.png" />
+                </button>
+              </div>
+            </li>
           );
         })}
-      </ImageList>
+      </ul>
     </>
   );
 };

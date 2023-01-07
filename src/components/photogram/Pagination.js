@@ -10,17 +10,17 @@ const Pagination = (props) => {
   const firstIndexToShow = useSelector(
     (state) => state.pagination.firstIndexToShow
   );
-  React.useEffect(calculatePagesNumber, [imagesLength]);
+  // React.useEffect(calculatePagesNumber, [imagesLength]);
   React.useEffect(createPaginationArray, [pagesNumber]);
   // React.useEffect(calculatePagesNumber, [firstIndexToShow]);
-  function calculatePagesNumber() {
-    dispatch({
-      type: "CALCULATE_PAGES_NUMBER",
-      payload: {
-        imagesLength: imagesLength,
-      },
-    });
-  }
+  // function calculatePagesNumber() {
+  //   dispatch({
+  //     type: "CALCULATE_PAGES_NUMBER",
+  //     payload: {
+  //       imagesLength: imagesLength,
+  //     },
+  //   });
+  // }
   function createPaginationArray() {
     let pages = [];
     for (let i = 0; i < pagesNumber; i++) {

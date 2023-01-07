@@ -5,18 +5,24 @@ import "./SearchBar.css";
 const API_KEY = "CxK-Wzyy1lvL4WyHG6VypCmrVvmU8iTsSyQr-dCZkws&page";
 const SearchBar = (props) => {
   const dispatch = useDispatch();
-  const [requestCounter, setRequestCounter] = React.useState(0);
   // const categories = [
+
   //   { name: "Animals", src: "./images/categories/animals.jpg" },
   //   { name: "Food", src: "./images/categories/food.jpg" },
   //   { name: "Sport", src: "./images/categories/sport.jpg" },
   //   { name: "Art", src: "./images/categories/art.jpg" },
   //   { name: "Nature", src: "./images/categories/nature.jpg" },
   // ];
-  const [searchValue, setSearchValue] = React.useState("cats");
-  const [searchPrevValue, setSearchPrevValue] = React.useState("");
+  const defaultSearchValue = useSelector(
+    (state) => state.search.searchValues.values[0]
+  );
+  const [searchValue, setSearchValue] = React.useState(
+    defaultSearchValue ? defaultSearchValue : ""
+  );
+  // const [searchPrevValue, setSearchPrevValue] = React.useState("");
   const searchActive = useSelector((state) => state.search.searchActive);
-  const [searchFocused, setSearchFocused] = React.useState(false);
+  const [searchValueNumber, setSearchValueNumber] = React.useState(0);
+  const [submitTrigger, setSubmitTrigger] = React.useState(false);
   const favoritesActive = useSelector(
     (state) => state.favorites.favoritesActive
   );
@@ -37,7 +43,9 @@ const SearchBar = (props) => {
 
   React.useEffect(() => {
     // fetchImages();
+    getSearchValuesFromLocalStorage();
   }, []);
+  React.useEffect(onSubmitHandler, [submitTrigger]);
   function clearSearchField() {
     setSearchValue(() => "");
   }
@@ -48,25 +56,35 @@ const SearchBar = (props) => {
         value: value,
       },
     });
-    props.calculatePagesNumber(true);
+    props.calculatePagesNumber(value);
   }
   function setFavoritesActive() {
     dispatch({
       type: "SET_FAVORITES_ACTIVE",
     });
-    props.calculatePagesNumber(true);
+    props.calculatePagesNumber(favoritesActive);
   }
   function onSubmitHandler() {
-    if (!isEmptyString(searchValue) && searchValue !== searchPrevValue) {
+    if (!isEmptyString(searchValue) && !valueAlreadyExists(searchValue)) {
       addSearchValue();
-      setSearchPrevValue(() => searchValue);
+      // setSearchPrevValue(() => searchValue);
+      setSearchValueNumber(() => searchValues.length);
+      console.log(searchValues.indexOf(searchValue));
       fetchImages();
       setSearchActive(true);
       rememberPreviousState(searchActive);
       resetPagination();
-      props.calculatePagesNumber();
+      // props.calculatePagesNumber();
       if (favoritesActive) setFavoritesActive();
     }
+  }
+  function valueAlreadyExists(value) {
+    let exists = false;
+    searchValues.forEach((el) => {
+      if (el === value) return true;
+
+      return exists;
+    });
   }
   function isEmptyString(input) {
     let isEmpty = true;
@@ -84,6 +102,7 @@ const SearchBar = (props) => {
     if (!favoritesActive) {
       setFavoritesActive();
       setSearchActive(false);
+      resetPagination();
       props.calculatePagesNumber(true);
     } else {
       setFavoritesActive();
@@ -115,10 +134,22 @@ const SearchBar = (props) => {
       payload: { searchValue: searchValue },
     });
   }
+  function removeSearchValue(index) {
+    dispatch({ type: "REMOVE_SEARCH_VALUE", payload: { index: index } });
+  }
+  function setSearchQuery(value) {
+    //submitTrigger
+    setSearchValue(() => value);
+    setSearchActive(() => true);
+    if (favoritesActive) setFavoritesActive();
+    dispatch({
+      type: "SET_SHOULD_RETURN_PREV_STATE",
+      payload: { value: false },
+    });
+    // resetPagination();
+    setSubmitTrigger((prev) => !prev);
+  }
   function fetchImages() {
-    console.log("Request has been sent", requestCounter + 1);
-    setRequestCounter((prev) => prev + 1);
-    const query = searchValue;
     fetch(
       `https://api.unsplash.com/search/photos?client_id=${API_KEY}&page=1&per_page=${queryParams.imagesCount}&orientation=landscape&query=${queryParams.search}`
     )
@@ -126,7 +157,12 @@ const SearchBar = (props) => {
       .then((res) => {
         console.log(res.results);
         let newImages = res.results.map((el, index) => {
-          return { id: el.id, src: el.urls.regular };
+          return {
+            id: el.id,
+            src: el.urls.regular,
+            width: el.width,
+            height: el.height,
+          };
         });
         newImages = shuffleImages(newImages);
         dispatch({ type: "FETCH_IMAGES", payload: { newImages: newImages } });
@@ -142,12 +178,14 @@ const SearchBar = (props) => {
     }
     return result;
   }
+  function getSearchValuesFromLocalStorage() {
+    dispatch({ type: "GET_SEARCH_VALUES_FROM_LOCAL_STORAGE" });
+  }
   function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
-
   return (
     <div className="search-bar">
       <div className="search-top">
@@ -167,24 +205,42 @@ const SearchBar = (props) => {
               onChange={(e) => {
                 setSearchValue(() => e.target.value);
               }}
-              onFocus={() => {
-                setSearchFocused(() => true);
-              }}
-              onBlur={() => {
-                setSearchFocused(() => false);
-              }}
+
+              // onBlur={() => {
+              //   setTimeout(() => {
+              //     setSearchFocused(() => false);
+              //   }, 100);
+              // }}
             ></input>
-            {searchFocused && (
+            {
               <ul className="search-values">
                 {searchValues.map((el, index) => {
                   return (
-                    <li key={index} className="search-value">
+                    <li
+                      key={index}
+                      className={
+                        searchValueNumber === index
+                          ? "search-value active"
+                          : "search-value"
+                      }
+                      onClick={(e) => {
+                        if (e.target.className === "search-value") {
+                          setSearchValueNumber(() => index);
+                          setSearchQuery(el);
+                        }
+                      }}
+                    >
                       {el}
+                      <span
+                        onClick={() => {
+                          removeSearchValue(index);
+                        }}
+                      />
                     </li>
                   );
                 })}
               </ul>
-            )}
+            }
           </form>
           <button
             className="clear-btn"

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./Photogram.css";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
 import Preview from "./Preview";
 import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
