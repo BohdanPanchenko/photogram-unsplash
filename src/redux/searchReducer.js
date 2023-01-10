@@ -1,22 +1,20 @@
 const initialState = {
   images: [],
-  searchActive: true,
+  activeScreen: "search",
   searchPaginationInfo: {
     pagesNumber: 1,
     firstIndexToShow: 0,
     currentPage: 1,
   },
-  searchValues: {
-    values: [],
-    searchCount: 0,
+  searchOptions: {
+    values: ["cats"],
   },
 };
 
 const searchReducer = (state = initialState, { type, payload }) => {
   switch (type) {
-    case "SET_SEARCH_ACTIVE":
-      console.log("searchActive:", payload.value);
-      return { ...state, searchActive: payload.value };
+    case "SET_ACTIVE_SCREEN":
+      return { ...state, activeScreen: payload.value };
     case "FETCH_IMAGES":
       return { ...state, images: payload.newImages };
     case "REMEMBER_SEARCH_PREVIOUS_STATE":
@@ -24,47 +22,52 @@ const searchReducer = (state = initialState, { type, payload }) => {
         ...state,
         searchPaginationInfo: payload.previousState,
       };
-    case "GET_SEARCH_VALUES_FROM_LOCAL_STORAGE":
-      const newSearchValues = JSON.parse(localStorage.getItem("searchValues"));
-      if (newSearchValues)
+    case "GET_SEARCH_OPTIONS_FROM_LOCAL_STORAGE":
+      const newSearchOptions = JSON.parse(
+        localStorage.getItem("searchOptions")
+      );
+      if (newSearchOptions)
         return {
           ...state,
-          searchValues: {
-            ...state.searchValues,
-            values: newSearchValues,
-            searchCount: newSearchValues.length,
+          searchOptions: {
+            ...state.searchOptions,
+            values: newSearchOptions,
           },
         };
       else return { ...state };
-    case "ADD_SEARCH_VALUE":
-      if (state.searchValues.values.indexOf(payload.searchValue) !== -1)
+    case "ADD_SEARCH_OPTION":
+      if (state.searchOptions.values.indexOf(payload.searchOption) !== -1)
         return { ...state };
-      let searchCount = state.searchValues.searchCount;
-      if (searchCount >= 6) searchCount = 0;
-      else searchCount++;
 
-      let searchValues = [...state.searchValues.values];
-      searchValues[state.searchValues.searchCount] = payload.searchValue;
-
-      localStorage.setItem("searchValues", JSON.stringify(searchValues));
+      let searchOptions = [...state.searchOptions.values];
+      if (searchOptions.length >= 6) {
+        searchOptions.pop();
+        searchOptions.unshift(payload.searchOption);
+      } else searchOptions.push(payload.searchOption);
+      localStorage.setItem("searchOptions", JSON.stringify(searchOptions));
       return {
         ...state,
-        searchValues: {
-          ...searchValues,
-          values: searchValues,
-          searchCount: searchCount,
+        searchOptions: {
+          ...searchOptions,
+          values: searchOptions,
         },
       };
-    case "REMOVE_SEARCH_VALUE":
-      let valuesCopy = [...state.searchValues.values];
+    case "REMOVE_SEARCH_OPTION":
+      if (state.searchOptions.values.length === 1)
+        return {
+          ...state,
+          images: [],
+          searchOptions: { ...state.searchOptions, values: [] },
+        };
+      let valuesCopy = [...state.searchOptions.values];
       valuesCopy.splice(payload.index, 1);
-      localStorage.setItem("searchValues", JSON.stringify(valuesCopy));
+      localStorage.setItem("searchOptions", JSON.stringify(valuesCopy));
       return {
         ...state,
-        searchValues: {
-          ...state.searchValues,
+        searchOptions: {
+          ...state.searchOptions,
           values: valuesCopy,
-          searchCount: state.searchValues.searchCount - 1,
+          searchCount: state.searchOptions.searchCount - 1,
         },
       };
     default:

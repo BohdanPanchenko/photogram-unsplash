@@ -10,8 +10,6 @@
     padding-bottom: 50px;
 }
 
-.prev-btn {}
-
 .prev-btn,
 .next-btn {
 
@@ -40,7 +38,6 @@
     transform: rotate(-180deg);
 }
 
-.next-btn {}
 
 .pages {
     display: flex;

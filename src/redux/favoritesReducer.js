@@ -1,6 +1,5 @@
 const initialState = {
   favorites: [],
-  favoritesActive: false,
   favoritesPaginationInfo: {
     pagesNumber: 1,
     firstIndexToShow: 0,
@@ -26,6 +25,13 @@ const favoritesReducer = (state = initialState, { type, payload }) => {
       const favoriteImg = {
         id: payload.id,
         src: payload.src,
+        width: payload.width,
+        height: payload.height,
+        downloadLinks: {
+          small: payload.small,
+          regular: payload.regular,
+          full: payload.full,
+        },
       };
       return { ...state, favorites: [...state.favorites, favoriteImg] };
     case "REMOVE_FROM_FAVORITES":

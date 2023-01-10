@@ -4,23 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 const Pagination = (props) => {
   const dispatch = useDispatch();
   const [pages, setPages] = React.useState([]);
-  const imagesLength = useSelector((state) => state.search.images.length);
   const pagesNumber = useSelector((state) => state.pagination.pagesNumber);
   const currentPage = useSelector((state) => state.pagination.currentPage);
   const firstIndexToShow = useSelector(
     (state) => state.pagination.firstIndexToShow
   );
-  // React.useEffect(calculatePagesNumber, [imagesLength]);
   React.useEffect(createPaginationArray, [pagesNumber]);
-  // React.useEffect(calculatePagesNumber, [firstIndexToShow]);
-  // function calculatePagesNumber() {
-  //   dispatch({
-  //     type: "CALCULATE_PAGES_NUMBER",
-  //     payload: {
-  //       imagesLength: imagesLength,
-  //     },
-  //   });
-  // }
+
   function createPaginationArray() {
     let pages = [];
     for (let i = 0; i < pagesNumber; i++) {
