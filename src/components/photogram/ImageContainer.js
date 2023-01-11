@@ -23,7 +23,6 @@ const ImageContainer = (props) => {
   React.useEffect(getFavoritesFromLocalStorage, []);
   React.useEffect(saveFavoritesToLocalStorage, [favorites]);
   React.useEffect(() => {
-    imageListElement.current.scrollTop = 0;
     fillImagesToShow();
   }, [images, firstIndexToShow, activeScreen, favorites]);
   React.useEffect(() => {
