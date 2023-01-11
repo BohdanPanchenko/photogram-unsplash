@@ -29,7 +29,10 @@ const ImageContainer = (props) => {
   React.useEffect(() => {
     props.getImagesToShowLength(imagesToShow.length);
   }, [imagesToShow]);
-
+ React.useEffect(scrollToTheTop, [firstIndexToShow]);
+  function scrollToTheTop() {
+    imageListElement.current.scrollTop = 0;
+  }
   function fillImagesToShow() {
     // if (!images.length && !favoritesActive) return;
     if (activeScreen === "search") {
