@@ -274,6 +274,9 @@ button {
         width: 100%;
         justify-content: center;
     }
+    .search-bar{
+    padding: 10px 0;
+    }
 }
 
 @media (max-width:425px) {
