@@ -46,7 +46,8 @@
     border-radius: 25px;
 }
 
-
+.preview-img img {
+width:50%;}
 
 @keyframes slide-in-top {
     0% {
