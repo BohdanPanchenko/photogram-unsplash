@@ -39,8 +39,6 @@
 .wrapper>ul>li {
     position: relative;
     box-shadow: 0 1px 6px rgb(32 33 36 / 28%);
-    /* flex-basis: 32.83%;
-    padding-bottom: 21.66%; */
     flex-basis: 31.25%;
     padding-bottom: 20.25%;
 
@@ -54,10 +52,12 @@
     top: 50%;
     left: 50%;
     transform: translateY(-50%) translateX(-50%);
-
-
+    will-change: transform;
+    transition:0.5s;
 }
-
+.wrapper>ul>li.image-item:hover>img {
+    transform: translateY(-50%) translateX(-50%) scale(1.06);
+}
 .wrapper>ul>li .favorite {
     order: 2;
 }
