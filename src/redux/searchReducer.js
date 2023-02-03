@@ -10,7 +10,7 @@ const initialState = {
   searchOptions: {
     values: ["cats"],
   },
-  activeSearchOption: this.searchOptions.values[0],
+  activeSearchOption: "cats",
   isFetching: true,
 };
 
