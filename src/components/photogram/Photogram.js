@@ -1,12 +1,15 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
 import "./Photogram.css";
 import Preview from "./Preview";
 import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
 import ImageContainer from "./ImageContainer";
+import Preloader from "./Preloader";
 
 const Photogram = () => {
+  const isFetching = useSelector((state) => state.search.isFetching);
   const [imagesToShowLength, setImagesToShowLength] = React.useState(0);
   const [previewImage, setPreviewImage] = React.useState("");
 
@@ -37,10 +40,15 @@ const Photogram = () => {
         />
         <h3 className="placeholder-text">There's no images found!</h3>
       </div>
-      <ImageContainer
-        openPreview={openPreview}
-        getImagesToShowLength={getImagesToShowLength}
-      />
+      {isFetching ? (
+        <Preloader />
+      ) : (
+        <ImageContainer
+          openPreview={openPreview}
+          getImagesToShowLength={getImagesToShowLength}
+        />
+      )}
+
       <Pagination />
     </div>
   );

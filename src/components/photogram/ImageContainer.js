@@ -6,6 +6,9 @@ const ImageContainer = (props) => {
   const imagesPerPage = 6;
   const heightToWidth = 0.65;
   const imagePlaceholderURL = "./images/placeholder-image.jpg";
+  const activeSearchOption = useSelector(
+    (state) => state.search.activeSearchOption
+  );
   const imageListElement = React.useRef(null);
   const [downloadBoxExitAnimation, setDownloadBoxExitAnimation] =
     React.useState(false);
@@ -28,12 +31,11 @@ const ImageContainer = (props) => {
   React.useEffect(() => {
     props.getImagesToShowLength(imagesToShow.length);
   }, [imagesToShow]);
- React.useEffect(scrollToTheTop, [firstIndexToShow]);
+  React.useEffect(scrollToTheTop, [activeSearchOption, firstIndexToShow]);
   function scrollToTheTop() {
     imageListElement.current.scrollTop = 0;
   }
   function fillImagesToShow() {
-    // if (!images.length && !favoritesActive) return;
     if (activeScreen === "search") {
       setImagesToShow(() =>
         images.filter(

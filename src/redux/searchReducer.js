@@ -6,9 +6,12 @@ const initialState = {
     firstIndexToShow: 0,
     currentPage: 1,
   },
+
   searchOptions: {
     values: ["cats"],
   },
+  activeSearchOption: this.searchOptions.values[0],
+  isFetching: true,
 };
 
 const searchReducer = (state = initialState, { type, payload }) => {
@@ -16,7 +19,12 @@ const searchReducer = (state = initialState, { type, payload }) => {
     case "SET_ACTIVE_SCREEN":
       return { ...state, activeScreen: payload.value };
     case "FETCH_IMAGES":
-      return { ...state, images: payload.newImages };
+      return {
+        ...state,
+        images: payload.newImages,
+        isFetching: false,
+        activeSearchOption: payload.activeSearchOption,
+      };
     case "REMEMBER_SEARCH_PREVIOUS_STATE":
       return {
         ...state,
@@ -70,6 +78,8 @@ const searchReducer = (state = initialState, { type, payload }) => {
           searchCount: state.searchOptions.searchCount - 1,
         },
       };
+    case "SET_IS_FETCHING":
+      return { ...state, isFetching: payload.isFetching };
     default:
       return state;
   }

@@ -67,7 +67,14 @@ const SearchBar = () => {
   function resetPagination() {
     dispatch({ type: "RESET_PAGINATION" });
   }
-
+  function setIsFetching() {
+    dispatch({
+      type: "SET_IS_FETCHING",
+      payload: {
+        isFetching: true,
+      },
+    });
+  }
   function returnPrevState() {
     if (activeScreen === "favorites")
       dispatch({
@@ -117,6 +124,7 @@ const SearchBar = () => {
     dispatch({ type: "REMOVE_SEARCH_OPTION", payload: { index: index } });
   }
   function fetchImages(searchValue) {
+    setIsFetching();
     fetch(
       `https://api.unsplash.com/search/photos?client_id=${API_KEY}&page=1&per_page=${queryParams.imagesCount}&orientation=landscape&query=${searchValue}`
     )
@@ -138,7 +146,10 @@ const SearchBar = () => {
         });
         newImages = shuffleImages(newImages);
         dispatch({ type: "SET_ACTIVE_SCREEN", payload: { value: "search" } });
-        dispatch({ type: "FETCH_IMAGES", payload: { newImages: newImages } });
+        dispatch({
+          type: "FETCH_IMAGES",
+          payload: { newImages: newImages, activeSearchOption: searchValue },
+        });
         resetPagination();
       });
   }
