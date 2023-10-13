@@ -1,6 +1,6 @@
 const Preloader = () => {
   return (
-    <>
+    <div className="preloader">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         style={{
@@ -254,7 +254,7 @@ const Preloader = () => {
           </rect>
         </g>
       </svg>
-    </>
+    </div>
   );
 };
 
