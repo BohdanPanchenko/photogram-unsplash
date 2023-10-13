@@ -178,6 +178,9 @@ button {
 .btn-close:after {
   transform: translateY(-50%) rotate(-45deg);
 }
+.preloader {
+  padding-top: 200px;
+}
 
 @-webkit-keyframes fade-in {
   0% {

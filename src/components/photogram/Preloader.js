@@ -1,3 +1,4 @@
+import "./Photogram.css";
 const Preloader = () => {
   return (
     <div className="preloader">

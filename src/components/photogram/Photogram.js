@@ -29,9 +29,11 @@ const Photogram = () => {
         <Preview src={previewImage} closePreview={closePreview} />
       )}
       <SearchBar />
+
       <div
         className="placeholder"
-        style={{ display: !imagesToShowLength ? "" : "none" }}
+        style={{ display: !imagesToShowLength && !isFetching ? "" : "none" }}
+        // style={{ display: !imagesToShowLength ? "" : "none" }}
       >
         <img
           className="placeholder-image"
