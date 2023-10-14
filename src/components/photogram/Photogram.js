@@ -9,8 +9,15 @@ import ImageContainer from "./ImageContainer";
 import Preloader from "./Preloader";
 
 const Photogram = () => {
+  const imagesLength = useSelector((state) => state.search.images.length);
+  const favoritesLength = useSelector(
+    (state) => state.favorites.favorites.length
+  );
+  const activeScreen = useSelector((state) => state.search.activeScreen);
   const isFetching = useSelector((state) => state.search.isFetching);
-  const [imagesToShowLength, setImagesToShowLength] = React.useState(0);
+  const placeholderIsShown =
+    (!imagesLength && !isFetching) ||
+    (!favoritesLength && activeScreen !== "search");
   const [previewImage, setPreviewImage] = React.useState("");
 
   function openPreview(src) {
@@ -18,9 +25,6 @@ const Photogram = () => {
   }
   function closePreview(e) {
     setPreviewImage(() => "");
-  }
-  function getImagesToShowLength(length) {
-    setImagesToShowLength(() => length);
   }
 
   return (
@@ -32,8 +36,9 @@ const Photogram = () => {
 
       <div
         className="placeholder"
-        style={{ display: !imagesToShowLength && !isFetching ? "" : "none" }}
-        // style={{ display: !imagesToShowLength ? "" : "none" }}
+        style={{
+          display: placeholderIsShown ? "" : "none",
+        }}
       >
         <img
           className="placeholder-image"
@@ -45,10 +50,7 @@ const Photogram = () => {
       {isFetching ? (
         <Preloader />
       ) : (
-        <ImageContainer
-          openPreview={openPreview}
-          getImagesToShowLength={getImagesToShowLength}
-        />
+        <ImageContainer openPreview={openPreview} />
       )}
 
       <Pagination />

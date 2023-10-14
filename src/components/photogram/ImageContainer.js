@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { saveAs } from "file-saver";
 const ImageContainer = (props) => {
   const dispatch = useDispatch();
+
   const imagesPerPage = 6;
   const heightToWidth = 0.65;
   const imagePlaceholderURL = "./images/placeholder-image.jpg";
@@ -28,9 +29,6 @@ const ImageContainer = (props) => {
   React.useEffect(() => {
     fillImagesToShow();
   }, [images, firstIndexToShow, activeScreen, favorites]);
-  React.useEffect(() => {
-    props.getImagesToShowLength(imagesToShow.length);
-  }, [imagesToShow]);
   React.useEffect(scrollToTheTop, [activeSearchOption, firstIndexToShow]);
   function scrollToTheTop() {
     imageListElement.current.scrollTop = 0;
